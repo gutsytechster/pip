@@ -73,6 +73,12 @@ def test_basic_freeze(script):
     _check_output(result.stdout, expected)
 
 
+def test_pip(script):
+    r1 = script.pip("--version", use_module=False)
+    r2 = script.pip("--version")
+    assert r1.stdout == r2.stdout
+
+
 def test_freeze_with_pip(script):
     """Test pip shows itself"""
     result = script.pip('freeze', '--all')
