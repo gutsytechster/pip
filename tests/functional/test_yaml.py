@@ -107,7 +107,7 @@ def handle_request(script, action, requirement, options, new_resolver=False):
     args.append("--verbose")
 
     result = script.pip(*args,
-                        allow_stderr_error=True,
+                        expect_stderr_error=True,
                         expect_stderr_warning=True,
                         allow_error=True)
 
