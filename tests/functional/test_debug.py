@@ -24,7 +24,7 @@ def test_debug(script, expected_text):
     Check that certain strings are present in the output.
     """
     args = ['debug']
-    result = script.pip(*args, allow_stderr_warning=True)
+    result = script.pip(*args, expect_stderr_warning=True)
     stdout = result.stdout
 
     assert expected_text in stdout
@@ -35,7 +35,7 @@ def test_debug__library_versions(script):
     Check the library versions normal output.
     """
     args = ['debug']
-    result = script.pip(*args, allow_stderr_warning=True)
+    result = script.pip(*args, expect_stderr_warning=True)
     print(result.stdout)
 
     vendored_versions = create_vendor_txt_map()
@@ -55,7 +55,7 @@ def test_debug__tags(script, args):
     Check the compatible tag output.
     """
     args = ['debug'] + args
-    result = script.pip(*args, allow_stderr_warning=True)
+    result = script.pip(*args, expect_stderr_warning=True)
     stdout = result.stdout
 
     tags = compatibility_tags.get_supported()
@@ -79,7 +79,7 @@ def test_debug__target_options(script, args, expected):
     Check passing target-related options.
     """
     args = ['debug'] + args
-    result = script.pip(*args, allow_stderr_warning=True)
+    result = script.pip(*args, expect_stderr_warning=True)
     stdout = result.stdout
 
     assert 'Compatible tags: ' in stdout

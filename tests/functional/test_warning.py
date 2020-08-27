@@ -39,7 +39,7 @@ CPYTHON_DEPRECATION_TEXT = "January 1st, 2020"
 
 @skip_if_python2
 def test_version_warning_is_not_shown_if_python_version_is_not_2(script):
-    result = script.pip("debug", allow_stderr_warning=True)
+    result = script.pip("debug", expect_stderr_warning=True)
     assert DEPRECATION_TEXT not in result.stderr, str(result)
     assert CPYTHON_DEPRECATION_TEXT not in result.stderr, str(result)
 
@@ -51,7 +51,7 @@ def test_flag_does_nothing_if_python_version_is_not_2(script):
 
 @skip_if_not_python2
 def test_version_warning_is_shown_if_python_version_is_2(script):
-    result = script.pip("debug", allow_stderr_warning=True)
+    result = script.pip("debug", expect_stderr_warning=True)
     assert DEPRECATION_TEXT in result.stderr, str(result)
     if platform.python_implementation() == 'CPython':
         assert CPYTHON_DEPRECATION_TEXT in result.stderr, str(result)
@@ -62,7 +62,7 @@ def test_version_warning_is_shown_if_python_version_is_2(script):
 @skip_if_not_python2
 def test_version_warning_is_not_shown_when_flag_is_passed(script):
     result = script.pip(
-        "debug", "--no-python-version-warning", allow_stderr_warning=True
+        "debug", "--no-python-version-warning", expect_stderr_warning=True
     )
     assert DEPRECATION_TEXT not in result.stderr, str(result)
     assert CPYTHON_DEPRECATION_TEXT not in result.stderr, str(result)

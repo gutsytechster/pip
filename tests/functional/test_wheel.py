@@ -133,7 +133,7 @@ def test_pip_wheel_readonly_cache(script, data, tmpdir):
         '-f', data.find_links,
         '--cache-dir', cache_dir,
         'simple==3.0',
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
     )
     assert res.returncode == 0
     assert "The cache has been disabled." in str(res), str(res)
@@ -201,9 +201,9 @@ def test_no_clean_option_blocks_cleaning_after_wheel(
         '--find-links={data.find_links}'.format(**locals()),
         'simple',
         expect_temp=True,
-        # TODO: allow_stderr_warning is used for the --build deprecation,
+        # TODO: expect_stderr_warning is used for the --build deprecation,
         #       remove it when removing support for --build
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
     )
 
     if not use_new_resolver:

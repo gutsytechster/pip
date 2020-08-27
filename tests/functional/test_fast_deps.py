@@ -10,7 +10,7 @@ def pip(script, command, requirement):
     return script.pip(
         command, '--prefer-binary', '--no-cache-dir',
         '--use-feature=fast-deps', requirement,
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
     )
 
 
@@ -62,7 +62,7 @@ def test_require_hash(script, tmp_path):
     )
     result = script.pip(
         'download', '--use-feature=fast-deps', '-r', str(reqs),
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
     )
     created = list(map(basename, result.files_created))
     assert fnmatch.filter(created, 'idna-2.10*')

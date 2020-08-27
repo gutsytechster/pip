@@ -1568,7 +1568,7 @@ def test_install_incompatible_python_requires_wheel(script, with_wheel):
     """))
     script.run(
         'python', 'setup.py', 'bdist_wheel', '--universal',
-        cwd=pkga_path, allow_stderr_warning=PY2,
+        cwd=pkga_path, expect_stderr_warning=PY2,
     )
     result = script.pip('install', './pkga/dist/pkga-0.1-py2.py3-none-any.whl',
                         expect_error=True)

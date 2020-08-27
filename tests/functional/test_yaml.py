@@ -108,7 +108,7 @@ def handle_request(script, action, requirement, options, new_resolver=False):
 
     result = script.pip(*args,
                         allow_stderr_error=True,
-                        allow_stderr_warning=True,
+                        expect_stderr_warning=True,
                         allow_error=True)
 
     # Check which packages got installed

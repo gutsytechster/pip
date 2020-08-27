@@ -240,7 +240,7 @@ def test_respect_order_in_requirements_file(script, data):
 def test_install_local_editable_with_extras(script, data):
     to_install = data.packages.joinpath("LocalExtras")
     res = script.pip_install_local(
-        '-e', to_install + '[bar]', allow_stderr_warning=True
+        '-e', to_install + '[bar]', expect_stderr_warning=True
     )
     res.did_update(script.site_packages / 'easy-install.pth')
     res.did_create(script.site_packages / 'LocalExtras.egg-link')
@@ -385,7 +385,7 @@ def test_constraints_constrain_to_local_editable(
     result = script.pip(
         'install', '--no-index', '-f', data.find_links, '-c',
         script.scratch_path / 'constraints.txt', 'singlemodule',
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
         expect_error=use_new_resolver
     )
     if use_new_resolver:
@@ -402,7 +402,7 @@ def test_constraints_constrain_to_local(script, data, use_new_resolver):
     result = script.pip(
         'install', '--no-index', '-f', data.find_links, '-c',
         script.scratch_path / 'constraints.txt', 'singlemodule',
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
         expect_error=use_new_resolver
     )
     if use_new_resolver:
@@ -418,7 +418,7 @@ def test_constrained_to_url_install_same_url(script, data, use_new_resolver):
     result = script.pip(
         'install', '--no-index', '-f', data.find_links, '-c',
         script.scratch_path / 'constraints.txt', to_install,
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
         expect_error=use_new_resolver
     )
     if use_new_resolver:
@@ -469,7 +469,7 @@ def test_install_with_extras_from_constraints(script, data, use_new_resolver):
     )
     result = script.pip_install_local(
         '-c', script.scratch_path / 'constraints.txt', 'LocalExtras',
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
         expect_error=use_new_resolver
     )
     if use_new_resolver:
@@ -501,7 +501,7 @@ def test_install_with_extras_joined(script, data, use_new_resolver):
     )
     result = script.pip_install_local(
         '-c', script.scratch_path / 'constraints.txt', 'LocalExtras[baz]',
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
         expect_error=use_new_resolver
     )
     if use_new_resolver:
@@ -518,7 +518,7 @@ def test_install_with_extras_editable_joined(script, data, use_new_resolver):
     )
     result = script.pip_install_local(
         '-c', script.scratch_path / 'constraints.txt', 'LocalExtras[baz]',
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
         expect_error=use_new_resolver
     )
     if use_new_resolver:
@@ -557,7 +557,7 @@ def test_install_distribution_union_with_constraints(
         "{to_install}[bar]".format(**locals()))
     result = script.pip_install_local(
         '-c', script.scratch_path / 'constraints.txt', to_install + '[baz]',
-        allow_stderr_warning=True,
+        expect_stderr_warning=True,
         expect_error=use_new_resolver
     )
     if use_new_resolver:
