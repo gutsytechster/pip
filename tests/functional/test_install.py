@@ -69,7 +69,7 @@ def test_pep518_build_env_uses_same_pip(
         'python', pip_src / 'src/pip', 'install', '--no-index',
         '-f', common_wheels, '-f', data.packages,
         data.src.joinpath("pep518-3.0"),
-        expect_stderr=deprecated_python,
+        expect_stderr_warning=deprecated_python,
     )
 
 
@@ -113,7 +113,7 @@ def test_pep518_allows_missing_requires(script, data, common_wheels):
     result = script.pip(
         'install', '-f', common_wheels,
         data.src.joinpath("pep518_missing_requires"),
-        expect_stderr=True
+        expect_stderr_warning=True
     )
     # Make sure we don't warn when this occurs.
     assert "does not comply with PEP 518" not in result.stderr
@@ -724,7 +724,7 @@ def test_install_global_option(script):
     """
     result = script.pip(
         'install', '--global-option=--version', "INITools==0.1",
-        expect_stderr=True)
+        expect_stderr_warning=True)
     assert 'INITools==0.1\n' in result.stdout
     assert not result.files_created
 
@@ -750,7 +750,7 @@ def test_install_using_install_option_and_editable(script, tmpdir):
         'install', '-e', '{url}#egg=pip-test-package'
         .format(url=local_checkout(url, tmpdir)),
         '--install-option=--script-dir={folder}'.format(**locals()),
-        expect_stderr=True)
+        expect_stderr_warning=True)
     script_file = (
         script.venv / 'src' / 'pip-test-package' /
         folder / 'pip-test-package' + script.exe
@@ -770,7 +770,7 @@ def test_install_global_option_using_editable(script, tmpdir):
     result = script.pip(
         'install', '--global-option=--version', '-e',
         '{url}@0.2.5#egg=anyjson'.format(url=local_checkout(url, tmpdir)),
-        expect_stderr=True)
+        expect_stderr_warning=True)
     assert 'Successfully installed anyjson' in result.stdout
 
 
@@ -865,7 +865,7 @@ def test_install_package_with_target(script, with_wheel):
 
     # Test repeated call without --upgrade, no files should have changed
     result = script.pip_install_local(
-        '-t', target_dir, "simple==1.0", expect_stderr=True,
+        '-t', target_dir, "simple==1.0", expect_stderr_warning=True,
     )
     result.did_not_update(Path('scratch') / 'target' / 'simple')
 
@@ -1200,7 +1200,7 @@ def test_url_incorrect_case_file_index(script, data, with_wheel):
     """
     result = script.pip(
         'install', '--index-url', data.find_links3, "dinner",
-        expect_stderr=True,
+        expect_stderr_warning=True,
     )
 
     # only Upper-2.0.tar.gz should get installed.
@@ -1294,7 +1294,7 @@ def test_install_subprocess_output_handling(script, data):
     # With --verbose we should show the output.
     # Only count examples with sys.argv[1] == egg_info, because we call
     # setup.py multiple times, which should not count as duplicate output.
-    result = script.pip(*(args + ["--verbose"]), expect_stderr=True)
+    result = script.pip(*(args + ["--verbose"]), expect_stderr_warning=True)
     assert 1 == result.stderr.count("HELLO FROM CHATTYMODULE egg_info")
     script.pip("uninstall", "-y", "chattymodule")
 
@@ -1330,12 +1330,12 @@ def test_install_topological_sort(script, data):
 
 
 def test_install_wheel_broken(script, with_wheel):
-    res = script.pip_install_local('wheelbroken', expect_stderr=True)
+    res = script.pip_install_local('wheelbroken', expect_stderr_warning=True)
     assert "Successfully installed wheelbroken-0.1" in str(res), str(res)
 
 
 def test_cleanup_after_failed_wheel(script, with_wheel):
-    res = script.pip_install_local('wheelbrokenafter', expect_stderr=True)
+    res = script.pip_install_local('wheelbrokenafter', expect_stderr_warning=True)
     # One of the effects of not cleaning up is broken scripts:
     script_py = script.bin_path / "script.py"
     assert script_py.exists(), script_py
@@ -1359,7 +1359,7 @@ def test_install_builds_wheels(script, data, with_wheel):
     to_install = data.packages.joinpath('requires_wheelbroken_upper')
     res = script.pip(
         'install', '--no-index', '-f', data.find_links,
-        to_install, expect_stderr=True)
+        to_install, expect_stderr_warning=True)
     expected = ("Successfully installed requires-wheelbroken-upper-0"
                 " upper-2.0 wheelbroken-0.1")
     # Must have installed it all
@@ -1391,7 +1391,7 @@ def test_install_no_binary_disables_building_wheels(script, data, with_wheel):
     to_install = data.packages.joinpath('requires_wheelbroken_upper')
     res = script.pip(
         'install', '--no-index', '--no-binary=upper', '-f', data.find_links,
-        to_install, expect_stderr=True)
+        to_install, expect_stderr_warning=True)
     expected = ("Successfully installed requires-wheelbroken-upper-0"
                 " upper-2.0 wheelbroken-0.1")
     # Must have installed it all
@@ -1448,7 +1448,7 @@ def test_install_no_binary_disables_cached_wheels(script, data, with_wheel):
     script.pip('uninstall', 'upper', '-y')
     res = script.pip(
         'install', '--no-index', '--no-binary=:all:', '-f', data.find_links,
-        'upper', expect_stderr=True)
+        'upper', expect_stderr_warning=True)
     assert "Successfully installed upper-2.0" in str(res), str(res)
     # No wheel building for upper, which was blacklisted
     assert "Building wheel for upper" not in str(res), str(res)
@@ -1829,7 +1829,7 @@ def test_install_yanked_file_and_print_warning(script, data):
     result = script.pip(
         'install', 'simple==3.0',
         '--index-url', data.index_url('yanked'),
-        expect_stderr=True,
+        expect_stderr_warning=True,
     )
     expected_warning = 'Reason for being yanked: test reason message'
     assert expected_warning in result.stderr, str(result)
@@ -1884,7 +1884,7 @@ def test_install_skip_work_dir_pkg(script, data):
     pkg_path = create_test_package_with_setup(
         script, name='simple', version='1.0')
     script.pip('install', '-e', '.',
-               expect_stderr=True, cwd=pkg_path)
+               expect_stderr_warning=True, cwd=pkg_path)
 
     script.pip('uninstall', 'simple', '-y')
 
@@ -1892,7 +1892,7 @@ def test_install_skip_work_dir_pkg(script, data):
     # will install the package as it was uninstalled earlier
     result = script.pip('install', '--find-links',
                         data.find_links, 'simple',
-                        expect_stderr=True, cwd=pkg_path)
+                        expect_stderr_warning=True, cwd=pkg_path)
 
     assert 'Requirement already satisfied: simple' not in result.stdout
     assert 'Successfully installed simple' in result.stdout
@@ -1910,7 +1910,7 @@ def test_install_verify_package_name_normalization(script, package_name):
     pkg_path = create_test_package_with_setup(
         script, name='simple-package', version='1.0')
     result = script.pip('install', '-e', '.',
-                        expect_stderr=True, cwd=pkg_path)
+                        expect_stderr_warning=True, cwd=pkg_path)
     assert 'Successfully installed simple-package' in result.stdout
 
     result = script.pip('install', package_name)

@@ -108,7 +108,8 @@ def test_compressed_listing(tmpdir):
         "lib/mypkg/support/__pycache__/",
         "lib/random_other_place/",
     ])
-
+    compress_for_rename(sample)
+    assert False
     will_remove, will_skip = compress_for_output_listing(sample)
     will_rename = compress_for_rename(sample)
     assert sorted(expected_skip) == sorted(compact(will_skip))

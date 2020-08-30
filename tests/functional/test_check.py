@@ -256,7 +256,7 @@ def test_check_skip_work_dir_pkg(script):
         install_requires=['missing==0.1'])
 
     script.run('python', 'setup.py', 'egg_info',
-               expect_stderr=True, cwd=pkg_path)
+               expect_stderr_warning=True, cwd=pkg_path)
 
     # Check should not complain about broken requirements
     # when run from package directory
@@ -281,7 +281,7 @@ def test_check_include_work_dir_pkg(script):
         install_requires=['missing==0.1'])
 
     script.run('python', 'setup.py', 'egg_info',
-               expect_stderr=True, cwd=pkg_path)
+               expect_stderr_warning=True, cwd=pkg_path)
 
     script.environ.update({'PYTHONPATH': pkg_path})
 
