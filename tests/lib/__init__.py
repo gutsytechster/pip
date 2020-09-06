@@ -400,6 +400,10 @@ def _check_stderr(
     :param expect_stderr_error: whether a logged error is allowed.
     """
     assert not (expect_stderr_error and not expect_stderr_warning)
+    error_expected = (expect_stderr_error and expect_stderr_warning)
+    warning_expected = (expect_stderr_warning and not expect_stderr_error)
+    error_raised = False
+    warning_raised = False
 
     lines = stderr.splitlines()
     for line in lines:
@@ -415,27 +419,35 @@ def _check_stderr(
             reason = 'stderr has a logging error, which is never allowed'
             msg = make_check_stderr_message(stderr, line=line, reason=reason)
             raise RuntimeError(msg)
-        if expect_stderr_error:
-            continue
 
         if line.startswith('ERROR: '):
+            if error_expected:
+                error_raised = True
+                continue
             reason = (
                 'stderr has an unexpected error '
                 '(pass expect_stderr_error=True to permit this)'
             )
             msg = make_check_stderr_message(stderr, line=line, reason=reason)
             raise RuntimeError(msg)
-        if expect_stderr_warning:
-            continue
 
         if (line.startswith('WARNING: ') or
                 line.startswith(DEPRECATION_MSG_PREFIX)):
+            if warning_expected:
+                warning_raised = True
+                continue
             reason = (
                 'stderr has an unexpected warning '
                 '(pass expect_stderr_warning=True to permit this)'
             )
             msg = make_check_stderr_message(stderr, line=line, reason=reason)
             raise RuntimeError(msg)
+
+    if error_expected and not error_raised:
+        raise RuntimeError("An error was expected, but no error raised")
+
+    if warning_expected and not warning_raised:
+        raise RuntimeError("A warning was expected, but no warning raised")
 
 
 class PipTestEnvironment(TestFileEnvironment):
@@ -562,12 +574,8 @@ class PipTestEnvironment(TestFileEnvironment):
             that the exit value is zero.
         :param expect_error: if False (the default), asserts that the command
             exits with 0.  Otherwise, asserts that the command exits with a
-            non-zero exit code.  Passing True also implies expect_stderr_error
+            non-zero exit code. Passing True also implies expect_stderr_error
             and expect_stderr_warning.
-        :param expect_stderr: whether to allow warnings in stderr (equivalent
-            to `expect_stderr_warning`).  This argument is an abbreviated
-            version of `expect_stderr_warning` and is also kept for backwards
-            compatibility.
         """
         if self.verbose:
             print('>> running {args} {kw}'.format(**locals()))
@@ -599,15 +607,6 @@ class PipTestEnvironment(TestFileEnvironment):
                     'expect_error=True'
                 )
             expect_stderr_error = True
-
-        elif kw.get('expect_stderr'):
-            # Then default to allowing logged warnings.
-            if expect_stderr_warning is not None and not expect_stderr_warning:
-                raise RuntimeError(
-                    'cannot pass expect_stderr_warning=False with '
-                    'expect_stderr=True'
-                )
-            expect_stderr_warning = True
 
         if expect_stderr_error:
             if expect_stderr_warning is not None and not expect_stderr_warning:
